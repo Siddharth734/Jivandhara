@@ -1,0 +1,46 @@
+-- Pixel level movement smoothening
+
+-- Weapon jerk(using sin) & randomness paramenters i.e. randint,choice
+
+Code1:
+        class JitteringSquare(pygame.sprite.Sprite):
+            def __init__(self, x, y):
+                super().__init__()
+                self.image = pygame.Surface((50, 50))  # A square of size 50x50
+                self.image.fill(BLUE)
+                self.rect = self.image.get_rect(center=(x, y))
+                self.base_position = pygame.Vector2(x, y)  # Base position of the square
+
+            def update(self):
+                # Apply random jitter to the position
+                jitter_x = random.uniform(-5, 5)  # Random jitter in x-direction
+                jitter_y = random.uniform(-5, 5)  # Random jitter in y-direction
+                self.rect.center = (self.base_position.x + jitter_x, self.base_position.y + jitter_y)
+
+Code2:
+        class Weapon(pygame.sprite.Sprite):
+            def __init__(self, x, y):
+                super().__init__()
+                self.image = pygame.Surface((50, 10))  # Example weapon
+                self.image.fill((255, 0, 0))
+                self.rect = self.image.get_rect(center=(x, y))
+                self.base_position = pygame.Vector2(x, y)  # Original position
+
+            def update(self):
+                # Add jitter to position
+                jitter_x = random.uniform(-3, 3)  # Jitter range in pixels
+                jitter_y = random.uniform(-3, 3)
+                self.rect.center = (self.base_position.x + jitter_x, self.base_position.y + jitter_y)
+
+My Code:
+        displacement = [-0.5,-0.3]
+                self.weapon.rect.centerx += sin(pygame.time.get_ticks()) * choice(displacement) * dt
+                self.weapon.rect.centery += sin(pygame.time.get_ticks()) * choice(displacement) * dt
+
+
+-- Enemy movement
+
+    Enemy move in the Fibonacci spiral
+
+
+-- Weapon stuck bug(using hasattr)
