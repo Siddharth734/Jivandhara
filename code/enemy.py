@@ -84,29 +84,6 @@ class Enemy(Entity):
         if self.status == "attack" and not self.attack_timer:
             self.attack_timer.activate()
 
-    # def animate(self, dt):
-    #     self.frame_index += self.animation_speed * dt
-
-    #     # Get the current animation frames
-    #     animation_frames = self.frames[self.status]
-
-    #     # If the attack animation finishes, allow a transition
-    #     if self.status == "attack" and self.frame_index >= len(animation_frames):
-    #         self.frame_index = 0  # Reset the animation
-    #         if not self.attack_timer.active:  # Only transition when the timer is inactive
-    #             self.status = "idle"
-
-    #     # Update the current image
-    #     self.image = animation_frames[int(self.frame_index) % len(animation_frames)]
-        
-    #     # Align the rect with the updated image
-    #     self.rect = self.image.get_rect(center=self.hitbox.center)
-
-    #     # Ensure the attack timer activates if the status is 'attack'
-    #     if self.status == "attack" and not self.attack_timer.active:
-    #         self.attack_timer.activate()
-
-
     def update(self,dt):
         self.attack_timer.update()
         self.move(self.speed,dt)

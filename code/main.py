@@ -6,7 +6,7 @@ class Game:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.RESIZABLE)
-        pygame.display.set_caption('ninja')
+        pygame.display.set_caption('Jivandhara')
         self.clock = pygame.time.Clock()
         self.running = True
 
