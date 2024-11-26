@@ -13,12 +13,13 @@ class   Player(Entity):
         self.state = 'down'
 
         self.obstacle_sprites = obstacle_sprites
-        self.attack_cooldown = Timer(500)
 
         self.create_attack = create_attack
         self.weapon_index = 0
         self.weapon = list(weapons_data.keys())[self.weapon_index]
         self.weapon_switch_timer = Timer(500)
+
+        self.attack_cooldown = Timer(500 + weapons_data[self.weapon]['cooldown'])
 
         self.create_magic = create_magic
         self.magic_index = 0
@@ -98,6 +99,11 @@ class   Player(Entity):
         self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]# Update current image
         self.rect = self.image.get_frect(center = self.hitbox.center)
 
+    def get_full_weapon_damage(self):
+        base_damage = self.stats['attack']
+        weapon_damage = weapons_data[self.weapon]['damage']
+        return base_damage + weapon_damage
+
     def update(self, dt):
         self.attack_cooldown.update()
         self.weapon_switch_timer.update()
@@ -105,4 +111,3 @@ class   Player(Entity):
         self.input() 
         self.move(self.speed, dt)
         self.animate(dt)
-        

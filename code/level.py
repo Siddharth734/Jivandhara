@@ -20,11 +20,14 @@ class Level:
         self.visible_sprites = YSortCameraGroup(self.display_surface)
         self.obstacle_sprites = pygame.sprite.Group()
 
-        self.time = 500
-        self.kill_timer = Timer(self.time,func=self.killit)
-        #self is refrenced to the level class thus self.kill failed as it should be refrenced to weapon class
+        self.attack_sprites = pygame.sprite.Group()
+        self.attackable_sprites = pygame.sprite.Group()
 
         self.create_map()
+
+        self.time = 500 + weapons_data[self.player.weapon]['cooldown']
+        self.kill_timer = Timer(self.time,func=self.killit)
+        #self is refrenced to the level class thus self.kill failed as it should be refrenced to weapon class
 
         self.ui = UI()
     
@@ -51,11 +54,16 @@ class Level:
                         if style == 'grass':
                             random_glass_surf = graphics['grass'][randint(0,2)]
                             #choice(graphics['grass']) can also be used
-                            Tile((x,y), (self.visible_sprites, self.obstacle_sprites), 'grass', random_glass_surf)
+                            Tile(
+                                (x,y),
+                                (self.visible_sprites, self.obstacle_sprites,self.attackable_sprites),
+                                'grass', random_glass_surf)
+                            
                         if style == 'object':
                             #col gives the index/tells specifically where to place the surface according to the tiled map
                             objects_surf = graphics['objects'][int(col)]
                             Tile((x,y), (self.visible_sprites, self.obstacle_sprites), 'objects', objects_surf)
+
                         if style == 'entities':
                             if col == '394':
                                 self.player = Player(
@@ -69,17 +77,33 @@ class Level:
                                 elif col == '391': monster_name = 'spirit'
                                 elif col == '392': monster_name = 'raccoon'
                                 else: monster_name = 'squid' 
-                                Enemy(monster_name,(x,y), self.visible_sprites, self.obstacle_sprites)
+                                Enemy(
+                                    monster_name,
+                                    (x,y),
+                                    (self.visible_sprites,self.attackable_sprites),
+                                    self.obstacle_sprites)
 
     def create_attack(self):
         if not hasattr(self, 'weapon') or self.weapon is None or not self.weapon.alive():
             self.kill_timer.activate() 
-            self.weapon = Weapon(self.player, (self.visible_sprites))
+            self.weapon = Weapon(self.player, (self.visible_sprites,self.attack_sprites))
 
     def create_magic(self,style,strength,cost):
         print(style)
         print(strength)
         print(cost)
+
+    #if statement is used here to check if the group is not a none and a valid group
+    def player_attack_logic(self):
+        if self.attack_sprites:
+            for attack_sprite in self.attack_sprites:
+                collision_sprites = pygame.sprite.spritecollide(attack_sprite, self.attackable_sprites, False)
+                if collision_sprites:
+                    for target_sprite in collision_sprites:
+                        if target_sprite.sprite_type == 'grass':
+                            target_sprite.kill()
+                        else:
+                            target_sprite.get_damage(self.player,attack_sprite.sprite_type)#damaged by magic or by weapon
 
     def killit(self):
         if not hasattr(self, 'weapon') or self.weapon.alive():
@@ -98,9 +122,8 @@ class Level:
         self.visible_sprites.draw(self.player.rect.center)
         self.visible_sprites.enemy_update(self.player)
         self.visible_sprites.update(dt)
-
+        self.player_attack_logic()
         self.ui.display(self.player)
-        # Debug()
 
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self, display_surface):

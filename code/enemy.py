@@ -84,10 +84,21 @@ class Enemy(Entity):
         if self.status == "attack" and not self.attack_timer:
             self.attack_timer.activate()
 
+    def get_damage(self,player,attack_type):
+        if attack_type == 'weapon':
+            self.health -= player.get_full_weapon_damage()
+        else:
+            pass
+
+    def check_death(self):
+        if self.health <= 0:
+            self.kill()
+
     def update(self,dt):
         self.attack_timer.update()
         self.move(self.speed,dt)
         self.animate(dt)
+        self.check_death()
 
     def enemy_update(self, player):
         self.get_status(player)

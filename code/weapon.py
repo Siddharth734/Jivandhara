@@ -4,6 +4,7 @@ from timee import Timer
 class Weapon(pygame.sprite.Sprite):
     def __init__(self,player,groups):
         super().__init__(groups)
+        self.sprite_type = 'weapon'
         self.direction = player.state.split('_')[0]
 
         full_path = join('graphics','weapons',f"{player.weapon}",f"{self.direction}.png")
