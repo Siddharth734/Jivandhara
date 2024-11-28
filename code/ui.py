@@ -28,7 +28,7 @@ class UI:
         current_rect = bg_rect.copy()
         current_rect.width = bg_rect.width * health_ratio
 
-        pygame.draw.rect(self.display_surface,color,current_rect,0,5)
+        if current > 0: pygame.draw.rect(self.display_surface,color,current_rect,0,5)
         pygame.draw.rect(self.display_surface,UI_BORDER_COLOUR,bg_rect,3,5)
 
     #str(int(exp)) first converting exp to integer to avoid large float values then converting it into a string

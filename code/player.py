@@ -78,10 +78,11 @@ class   Player(Entity):
 
     def animate(self, dt):
         # Update movement state based on direction
-        if self.direction.x != 0:
-            self.state = 'right' if self.direction.x > 0 else 'left'
-        if self.direction.y != 0:
-            self.state = 'down' if self.direction.y > 0 else 'up'
+        if not self.attack_cooldown:
+            if self.direction.x != 0:
+                self.state = 'right' if self.direction.x > 0 else 'left'
+            if self.direction.y != 0:
+                self.state = 'down' if self.direction.y > 0 else 'up'
         
         # Handle attack animation state
         if self.attack_cooldown.active:
@@ -98,6 +99,12 @@ class   Player(Entity):
         self.frame_index *= 0 if not self.direction.x and not self.direction.y else 1
         self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]# Update current image
         self.rect = self.image.get_frect(center = self.hitbox.center)
+
+        if self.vulnerability_timer:
+            alpha = self.wave_value()
+            self.image.set_alpha(alpha)
+        else:
+            self.image.set_alpha(255)
 
     def get_full_weapon_damage(self):
         base_damage = self.stats['attack']

@@ -81,7 +81,8 @@ class Level:
                                     monster_name,
                                     (x,y),
                                     (self.visible_sprites,self.attackable_sprites),
-                                    self.obstacle_sprites)
+                                    self.obstacle_sprites,
+                                    self.damage_player)
 
     def create_attack(self):
         if not hasattr(self, 'weapon') or self.weapon is None or not self.weapon.alive():
@@ -97,13 +98,18 @@ class Level:
     def player_attack_logic(self):
         if self.attack_sprites:
             for attack_sprite in self.attack_sprites:
-                collision_sprites = pygame.sprite.spritecollide(attack_sprite, self.attackable_sprites, False)
+                collision_sprites = pygame.sprite.spritecollide(attack_sprite, self.attackable_sprites, False,pygame.sprite.collide_mask)
                 if collision_sprites:
                     for target_sprite in collision_sprites:
                         if target_sprite.sprite_type == 'grass':
                             target_sprite.kill()
                         else:
                             target_sprite.get_damage(self.player,attack_sprite.sprite_type)#damaged by magic or by weapon
+
+    def damage_player(self,amount,attack_type):
+        if not self.player.vulnerability_timer:
+            self.player.health -= amount
+            self.player.vulnerability_timer.activate()
 
     def killit(self):
         if not hasattr(self, 'weapon') or self.weapon.alive():

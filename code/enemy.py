@@ -3,7 +3,7 @@ from entity import Entity
 from timee import Timer
 
 class Enemy(Entity):
-    def __init__(self, monster_name, pos, groups, obstacle_sprites):
+    def __init__(self, monster_name, pos, groups, obstacle_sprites,damage_player):
         super().__init__(groups)
         self.sprite_type = 'enemy'
 
@@ -28,6 +28,7 @@ class Enemy(Entity):
         self.attack_type = monster_info['attack_type']
 
         self.attack_timer = Timer(400)
+        self.damage_player = damage_player
 
     def import_graphics(self, name):
         self.frames = {'idle':[],'move':[],'attack':[]}
@@ -66,7 +67,7 @@ class Enemy(Entity):
     #attacks, follows, and stops following according to the radius detection
     def actions(self,player):
         if self.status == 'attack':
-            print('attack')
+            self.damage_player(self.attack_damage, self.attack_type)
         elif self.status == 'move':
             self.direction = self.get_player_distance_direction(player)[1]
         else:
@@ -84,18 +85,36 @@ class Enemy(Entity):
         if self.status == "attack" and not self.attack_timer:
             self.attack_timer.activate()
 
+        if self.monster_name != 'spirit':
+            if self.vulnerability_timer:
+                alpha = self.wave_value()
+                self.image.set_alpha(alpha)
+            else:
+                self.image.set_alpha(255)
+
+        else: self.image.set_alpha(100)
+
     def get_damage(self,player,attack_type):
-        if attack_type == 'weapon':
-            self.health -= player.get_full_weapon_damage()
-        else:
-            pass
+        if not self.vulnerability_timer:
+            self.direction = self.get_player_distance_direction(player)[1]
+            if attack_type == 'weapon':
+                self.health -= player.get_full_weapon_damage()
+            else:
+                pass
+            self.vulnerability_timer.activate()
 
     def check_death(self):
         if self.health <= 0:
             self.kill()
 
+    def knockback(self):
+        if self.vulnerability_timer:
+            self.direction *= -self.resistance
+
     def update(self,dt):
         self.attack_timer.update()
+        self.vulnerability_timer.update()
+        self.knockback()
         self.move(self.speed,dt)
         self.animate(dt)
         self.check_death()
@@ -103,3 +122,4 @@ class Enemy(Entity):
     def enemy_update(self, player):
         self.get_status(player)
         self.actions(player)
+        player.vulnerability_timer.update()
