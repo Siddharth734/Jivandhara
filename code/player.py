@@ -3,11 +3,11 @@ from timee import Timer
 from entity import Entity
 
 class   Player(Entity):
-    def __init__(self, pos, groups, obstacle_sprites,create_attack,create_magic):
+    def __init__(self, pos, groups, obstacle_sprites, create_attack, create_magic):
         super().__init__(groups)
         self.image = pygame.image.load(join('graphics','playerAnbu','down','down0.png')).convert_alpha()
         self.rect = self.image.get_frect(topleft = pos)
-        self.hitbox = self.rect.inflate(0,-26)
+        self.hitbox = self.rect.inflate(-6,HITBOX_OFFSET['player'])
 
         self.import_player_assets()
         self.state = 'down'
@@ -17,20 +17,25 @@ class   Player(Entity):
         self.create_attack = create_attack
         self.weapon_index = 0
         self.weapon = list(weapons_data.keys())[self.weapon_index]
-        self.weapon_switch_timer = Timer(500)
+        self.weapon_switch_timer = Timer(200)
 
-        self.attack_cooldown = Timer(500 + weapons_data[self.weapon]['cooldown'])
+        self.attack_cooldown = Timer(200 + weapons_data[self.weapon]['cooldown'])
 
         self.create_magic = create_magic
         self.magic_index = 0
         self.magic = list(magic_data.keys())[self.magic_index]
-        self.magic_switch = Timer(500)
+        self.magic_switch = Timer(200)
 
-        self.stats = {'health': 100,'energy': 60,'attack': 10,'magic': 4,'speed': 3}
+        self.stats = {'health': 100,'energy': 60,'attack': 10,'magic': 4,'speed': 2}
+        self.max_stats = {'health': 300,'energy': 180,'attack': 20,'magic': 10,'speed': 7}
+        self.upgrade_cost = {'health': 50,'energy': 50,'attack': 50,'magic': 50,'speed': 50}
         self.health = self.stats['health']
         self.energy = self.stats['energy']
-        self.exp = 123
+        self.exp = 50000
         self.speed = self.stats['speed']
+
+        self.weapon_attack_sound = pygame.mixer.Sound(join('audio','sword.wav'))
+        self.weapon_attack_sound.set_volume(uniform(0.1,0.4))
 
     def import_player_assets(self):
         self.frames = {
@@ -53,24 +58,26 @@ class   Player(Entity):
             self.direction.x = (int(Keys[pygame.K_RIGHT]) or int(Keys[pygame.K_d])) - (int(Keys[pygame.K_LEFT]) or int(Keys[pygame.K_a]))
             self.direction.y = (int(Keys[pygame.K_DOWN]) or int(Keys[pygame.K_s])) - (int(Keys[pygame.K_UP]) or int(Keys[pygame.K_w]))
 
-            if Keys[pygame.K_SPACE]:
+            recent_keys = pygame.key.get_just_pressed()
+            if recent_keys [pygame.K_SPACE]:
                 self.attack_cooldown.activate()
                 self.create_attack()
+                self.weapon_attack_sound.play()
 
-            if Keys[pygame.K_LCTRL]: 
+            if recent_keys[pygame.K_LCTRL]: 
                 self.attack_cooldown.activate()
                 style = self.magic
                 strength = magic_data[self.magic]['strength'] + self.stats['magic']
                 cost = magic_data[self.magic]['cost']
                 self.create_magic(style, strength, cost)
 
-            if Keys[pygame.K_TAB] and not self.weapon_switch_timer:
+            if recent_keys[pygame.K_TAB] and not self.weapon_switch_timer:
                 self.weapon_switch_timer.activate()
                 self.weapon_index += 1
                 self.weapon_index *= 0 if self.weapon_index > len(list(weapons_data.keys()))-1 else 1
                 self.weapon = list(weapons_data.keys())[self.weapon_index]
 
-            if Keys[pygame.K_q]  and not self.magic_switch:
+            if recent_keys[pygame.K_q]  and not self.magic_switch:
                 self.magic_switch.activate()
                 self.magic_index += 1
                 self.magic_index *= 0 if self.magic_index > len(list(magic_data.keys()))-1 else 1
@@ -110,11 +117,29 @@ class   Player(Entity):
         base_damage = self.stats['attack']
         weapon_damage = weapons_data[self.weapon]['damage']
         return base_damage + weapon_damage
+    
+    def get_full_magic_damage(self):
+        base_damage = self.stats['magic']
+        spell_damage = magic_data[self.magic]['strength']
+        return base_damage + spell_damage
+
+    def get_value_by_index(self, index):
+        return list(self.stats.values())[index]
+
+    def get_cost_by_index(self, index):
+        return list(self.upgrade_cost.values())[index]
+
+    def energy_recovery(self,dt):
+        if self.energy < self.stats['energy']:
+            self.energy += 0.009 * self.stats['magic'] * dt 
+        else:
+            self.energy = self.stats['energy']
 
     def update(self, dt):
         self.attack_cooldown.update()
         self.weapon_switch_timer.update()
         self.magic_switch.update()
         self.input() 
-        self.move(self.speed, dt)
+        self.move(self.stats['speed'], dt)
         self.animate(dt)
+        self.energy_recovery(dt)

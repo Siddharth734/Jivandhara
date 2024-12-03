@@ -12,17 +12,23 @@ class Game:
 
         self.level = Level()
 
+        main_sound = pygame.mixer.Sound(join('audio','Theme.ogg'))
+        # main_sound.set_volume(0.7)
+        main_sound.play(-1)
+
     def run(self):
         dt = self.clock.tick(FPS) / 1000
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    self.level.toggle_menu()
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_F11:
                     pygame.display.toggle_fullscreen()
 
-            self.screen.fill('#71ddee')
+            self.screen.fill(WATER_COLOR)
             self.level.run(dt)
             pygame.display.update()
 
@@ -31,4 +37,3 @@ class Game:
 if __name__ == '__main__':
     game = Game()
     game.run()
-    

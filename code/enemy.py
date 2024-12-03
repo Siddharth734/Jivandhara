@@ -3,7 +3,7 @@ from entity import Entity
 from timee import Timer
 
 class Enemy(Entity):
-    def __init__(self, monster_name, pos, groups, obstacle_sprites,damage_player):
+    def __init__(self, monster_name, pos, groups, obstacle_sprites, damage_player, trigger_death_particles, add_exp):
         super().__init__(groups)
         self.sprite_type = 'enemy'
 
@@ -27,8 +27,17 @@ class Enemy(Entity):
         self.attack_radius = monster_info['attack_radius']
         self.attack_type = monster_info['attack_type']
 
-        self.attack_timer = Timer(400)
+        self.attack_timer = Timer(500)
         self.damage_player = damage_player
+        self.trigger_death_particles = trigger_death_particles
+        self.add_exp = add_exp
+
+        self.attack_sound = pygame.mixer.Sound(join(*monster_info['attack_sound']))
+        self.death_sound = pygame.mixer.Sound(join('audio','death.wav'))
+        self.hit_sound = pygame.mixer.Sound(join('audio','hit.wav'))
+        self.death_sound.set_volume(uniform(0.1,0.2))
+        self.hit_sound.set_volume(uniform(0.1,0.2))
+        self.attack_sound.set_volume(uniform(0.1,0.3))
 
     def import_graphics(self, name):
         self.frames = {'idle':[],'move':[],'attack':[]}
@@ -42,10 +51,10 @@ class Enemy(Entity):
                         self.frames[state].append(frame)
 
     def get_player_distance_direction(self, player):
-        V_enemy = pygame.Vector2(self.rect.center)
-        V_player = pygame.Vector2(player.rect.center) 
-        distance = (V_player - V_enemy).magnitude()
-        direction = (V_player - V_enemy).normalize() if distance else pygame.Vector2()
+        enemyVector = pygame.Vector2(self.rect.center)
+        playerVector = pygame.Vector2(player.rect.center) 
+        distance = (playerVector - enemyVector).magnitude() 
+        direction = (playerVector - enemyVector).normalize() if distance else pygame.Vector2()
 
         return(distance,direction)
 
@@ -68,6 +77,7 @@ class Enemy(Entity):
     def actions(self,player):
         if self.status == 'attack':
             self.damage_player(self.attack_damage, self.attack_type)
+            self.attack_sound.play()
         elif self.status == 'move':
             self.direction = self.get_player_distance_direction(player)[1]
         else:
@@ -96,16 +106,20 @@ class Enemy(Entity):
 
     def get_damage(self,player,attack_type):
         if not self.vulnerability_timer:
+            self.hit_sound.play()
             self.direction = self.get_player_distance_direction(player)[1]
             if attack_type == 'weapon':
                 self.health -= player.get_full_weapon_damage()
             else:
-                pass
+                self.health -= player.get_full_magic_damage()
             self.vulnerability_timer.activate()
 
     def check_death(self):
         if self.health <= 0:
             self.kill()
+            self.trigger_death_particles(self.rect.center, self.monster_name)
+            self.add_exp(self.exp)
+            self.death_sound.play()
 
     def knockback(self):
         if self.vulnerability_timer:

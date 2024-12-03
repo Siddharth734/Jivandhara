@@ -7,14 +7,16 @@ from weapon import Weapon
 from timee import Timer
 from ui import UI
 from enemy import Enemy
-
-from random import randint,choice
+from particles import AnimationPlayer
+from magic import MagicPlayer
+from upgrade import Upgrade
 
 class Level:
     def __init__(self):
 
         #gets display surface from anywhere in the code
         self.display_surface = pygame.display.get_surface()
+        self.game_paused = False
 
         #sprite group setup
         self.visible_sprites = YSortCameraGroup(self.display_surface)
@@ -25,12 +27,16 @@ class Level:
 
         self.create_map()
 
-        self.time = 500 + weapons_data[self.player.weapon]['cooldown']
+        self.time = 200 + weapons_data[self.player.weapon]['cooldown']
         self.kill_timer = Timer(self.time,func=self.killit)
         #self is refrenced to the level class thus self.kill failed as it should be refrenced to weapon class
 
         self.ui = UI()
-    
+        self.upgrade = Upgrade(self.player)
+
+        self.animation_player = AnimationPlayer()
+        self.magic_player = MagicPlayer(self.animation_player)
+
     def create_map(self):
         layouts = {
             'boundary': import_csv_layout(join('map','map_FloorBlocks.csv')),
@@ -82,7 +88,9 @@ class Level:
                                     (x,y),
                                     (self.visible_sprites,self.attackable_sprites),
                                     self.obstacle_sprites,
-                                    self.damage_player)
+                                    self.damage_player,
+                                    self.trigger_death_particles,
+                                    self.add_exp)
 
     def create_attack(self):
         if not hasattr(self, 'weapon') or self.weapon is None or not self.weapon.alive():
@@ -90,9 +98,10 @@ class Level:
             self.weapon = Weapon(self.player, (self.visible_sprites,self.attack_sprites))
 
     def create_magic(self,style,strength,cost):
-        print(style)
-        print(strength)
-        print(cost)
+        if style == 'heal':
+            self.magic_player.heal(self.player, strength, cost, self.visible_sprites)
+        if style == 'flame':
+            self.magic_player.flame(self.player, strength, cost, (self.visible_sprites, self.attack_sprites))
 
     #if statement is used here to check if the group is not a none and a valid group
     def player_attack_logic(self):
@@ -102,6 +111,10 @@ class Level:
                 if collision_sprites:
                     for target_sprite in collision_sprites:
                         if target_sprite.sprite_type == 'grass':
+                            pos = target_sprite.rect.center
+                            offset = pygame.Vector2(0,75)
+                            for leaf in range(randint(3,6)):   
+                                self.animation_player.create_grass_particles(pos - offset, self.visible_sprites)
                             target_sprite.kill()
                         else:
                             target_sprite.get_damage(self.player,attack_sprite.sprite_type)#damaged by magic or by weapon
@@ -110,13 +123,30 @@ class Level:
         if not self.player.vulnerability_timer:
             self.player.health -= amount
             self.player.vulnerability_timer.activate()
+            self.animation_player.create_particles(attack_type, self.player.rect.center, self.visible_sprites)
 
     def killit(self):
         if not hasattr(self, 'weapon') or self.weapon.alive():
             self.weapon.kill()
             self.weapon = None
 
+    def trigger_death_particles(self,pos,particle_type):
+        self.animation_player.create_particles(particle_type, pos, self.visible_sprites)
+
+    def add_exp(self, amount):
+        self.player.exp += amount
+
+    def toggle_menu(self):
+        self.game_paused = not self.game_paused
+
     def run(self,dt):
+        if self.game_paused:
+            self.upgrade.display()
+        else:
+            self.kill_timer.update()
+            self.visible_sprites.enemy_update(self.player)
+            self.visible_sprites.update(dt)
+
         #weapon jerk
         if hasattr(self, 'weapon') and self.weapon:
             if self.weapon.direction == 'right' or self.weapon.direction == 'left':
@@ -124,12 +154,12 @@ class Level:
             if self.weapon.direction == 'down' or self.weapon.direction == 'up':
                 self.weapon.rect.centery += sin(pygame.time.get_ticks()) * randint(-1,2) * dt
 
-        self.kill_timer.update()
         self.visible_sprites.draw(self.player.rect.center)
-        self.visible_sprites.enemy_update(self.player)
-        self.visible_sprites.update(dt)
-        self.player_attack_logic()
         self.ui.display(self.player)
+        self.player_attack_logic()
+
+        if self.game_paused:
+            self.upgrade.display()
 
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self, display_surface):
