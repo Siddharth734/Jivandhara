@@ -29,7 +29,7 @@ Choose your champion and lead them through a realm filled with danger, magic, an
 
 1. Clone the repository:  
    ```bash
-   git clone https://github.com/yourusername/Jivandhara.git
+   git clone https://github.com/Siddharth734/Jivandhara.git
    ```  
 
 2. Install dependencies:  
@@ -48,7 +48,7 @@ Choose your champion and lead them through a realm filled with danger, magic, an
 - **Arrow Keys/WASD**: Move your character.  
 - **Spacebar**: Jump.  
 - **Left Mouse Button**: Attack/Use Magic.  
-- **X**: Special Ability
+<!-- - **X**: Special Ability -->
 
 ---
 
@@ -66,7 +66,7 @@ coming soon...
 ---
 
 ## **Credits**  
-- **Game Developer**: [Your Name]  
+- **Game Developer**: Siddharth Baghel
 - **Special Thanks**: Clear Code (for tutorials), The art assets and the soundtrack have been done by Pixel-boy and AAA and can be found here: https://pixel-boy.itch.io/ninja-adventure-asset-pack (published under a CC0 license).
 
 ---
