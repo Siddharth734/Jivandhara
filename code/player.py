@@ -31,7 +31,7 @@ class   Player(Entity):
         self.upgrade_cost = {'health': 50,'energy': 50,'attack': 50,'magic': 50,'speed': 50}
         self.health = self.stats['health']
         self.energy = self.stats['energy']
-        self.exp = 50000
+        self.exp = 200
         self.speed = self.stats['speed']
 
         self.weapon_attack_sound = pygame.mixer.Sound(join('audio','sword.wav'))

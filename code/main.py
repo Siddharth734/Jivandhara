@@ -12,9 +12,8 @@ class Game:
 
         self.level = Level()
 
-        main_sound = pygame.mixer.Sound(join('audio','Theme.ogg'))
         # main_sound.set_volume(0.7)
-        main_sound.play(-1)
+        self.level.main_sound.play(-1)
 
     def run(self):
         dt = self.clock.tick(FPS) / 1000

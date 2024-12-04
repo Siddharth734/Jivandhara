@@ -10,6 +10,7 @@ from enemy import Enemy
 from particles import AnimationPlayer
 from magic import MagicPlayer
 from upgrade import Upgrade
+from gameover import GAMEOVER
 
 class Level:
     def __init__(self):
@@ -17,6 +18,9 @@ class Level:
         #gets display surface from anywhere in the code
         self.display_surface = pygame.display.get_surface()
         self.game_paused = False
+        self.delay = 0
+
+        self.main_sound = pygame.mixer.Sound(join('audio','Theme.ogg')) 
 
         #sprite group setup
         self.visible_sprites = YSortCameraGroup(self.display_surface)
@@ -33,6 +37,7 @@ class Level:
 
         self.ui = UI()
         self.upgrade = Upgrade(self.player)
+        self.gameover = GAMEOVER()
 
         self.animation_player = AnimationPlayer()
         self.magic_player = MagicPlayer(self.animation_player)
@@ -140,26 +145,37 @@ class Level:
         self.game_paused = not self.game_paused
 
     def run(self,dt):
-        if self.game_paused:
-            self.upgrade.display()
+        if self.player and self.player.health<= 1:
+            if self.delay == 0:
+                self.delay += 1
+                pygame.time.delay(1000)
+                self.main_sound.stop()
+                self.main_sound = pygame.mixer.Sound(join('audio', 'rick.wav'))
+                self.main_sound.play()
+            self.gameover.display()
+            self.gameover.update(dt)
+
         else:
-            self.kill_timer.update()
-            self.visible_sprites.enemy_update(self.player)
-            self.visible_sprites.update(dt)
+            if self.game_paused:
+                self.upgrade.display()
+            else:
+                self.kill_timer.update()
+                self.visible_sprites.enemy_update(self.player)
+                self.visible_sprites.update(dt)
 
-        #weapon jerk
-        if hasattr(self, 'weapon') and self.weapon:
-            if self.weapon.direction == 'right' or self.weapon.direction == 'left':
-                self.weapon.rect.centerx += sin(pygame.time.get_ticks()) * randint(-1,2) * dt
-            if self.weapon.direction == 'down' or self.weapon.direction == 'up':
-                self.weapon.rect.centery += sin(pygame.time.get_ticks()) * randint(-1,2) * dt
+            #weapon jerk
+            if hasattr(self, 'weapon') and self.weapon:
+                if self.weapon.direction == 'right' or self.weapon.direction == 'left':
+                    self.weapon.rect.centerx += sin(pygame.time.get_ticks()) * randint(-1,2) * dt
+                if self.weapon.direction == 'down' or self.weapon.direction == 'up':
+                    self.weapon.rect.centery += sin(pygame.time.get_ticks()) * randint(-1,2) * dt
 
-        self.visible_sprites.draw(self.player.rect.center)
-        self.ui.display(self.player)
-        self.player_attack_logic()
+            self.visible_sprites.draw(self.player.rect.center)
+            self.ui.display(self.player)
+            self.player_attack_logic()
 
-        if self.game_paused:
-            self.upgrade.display()
+            if self.game_paused:
+                self.upgrade.display()
 
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self, display_surface):
