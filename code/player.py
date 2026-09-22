@@ -3,14 +3,25 @@ from timee import Timer
 from entity import Entity
 
 class   Player(Entity):
-    def __init__(self, pos, groups, obstacle_sprites, create_attack, create_magic):
+    def __init__(self, pos, groups, obstacle_sprites, create_attack, create_magic, create_signature, get_enemies):
         super().__init__(groups)
-        self.image = pygame.image.load(join('graphics','playerAnbu','down','down0.png')).convert_alpha()
-        self.rect = self.image.get_frect(topleft = pos)
-        self.hitbox = self.rect.inflate(-6,HITBOX_OFFSET['player'])
+        self.visible_sprites = groups
+        self.create_signature = create_signature
+        self.get_enemies = get_enemies
+        self.character_names = ['player', 'playerAnbu', 'playerFrog']
+        self.character_index = 1
+        self.character_name = self.character_names[self.character_index]
+        self.character_switch_timer = Timer(60000)
+        self.signature_ability = None
+        self.frog_signature_active = False
+        self.signature_attack_bonus = 0
+        self.defense_multiplier = 1
 
         self.import_player_assets()
         self.state = 'down'
+        self.image = self.frames[self.state][0]
+        self.rect = self.image.get_frect(topleft = pos)
+        self.hitbox = self.rect.inflate(-6,HITBOX_OFFSET['player'])
 
         self.obstacle_sprites = obstacle_sprites
 
@@ -33,6 +44,7 @@ class   Player(Entity):
         self.energy = self.stats['energy']
         self.exp = 200
         self.speed = self.stats['speed']
+        self.signature_ability = self.create_signature(self.character_name, self)
 
         self.weapon_attack_sound = pygame.mixer.Sound(join('audio','sword.wav'))
         self.weapon_attack_sound.set_volume(uniform(0.1,0.4))
@@ -45,12 +57,39 @@ class   Player(Entity):
             }
 
         for state in self.frames.keys():
-            for folder_path,sub_folders,file_names in walk(join('graphics','playerAnbu',state)):
+            for folder_path,sub_folders,file_names in walk(join('graphics',self.character_name,state)):
                 if file_names:
                     for file_name in file_names:
                         full_path = join(folder_path, file_name)
                         frame = pygame.image.load(full_path).convert_alpha()
                         self.frames[state].append(frame)
+            if not self.frames[state] and state.endswith('_idle'):
+                self.frames[state] = self.frames[state.replace('_idle', '')]
+
+    def switch_character(self):
+        if self.character_switch_timer or self.signature_ability.active:
+            return False
+
+        self.character_index = (self.character_index + 1) % len(self.character_names)
+        self.character_name = self.character_names[self.character_index]
+        self.state = self.state.split('_')[0]
+        self.frame_index = 0
+        self.import_player_assets()
+        self.image = self.frames[self.state][0]
+        self.rect = self.image.get_frect(center=self.hitbox.center)
+        self.character_switch_timer.activate()
+        self.signature_ability = self.create_signature(self.character_name, self)
+        return True
+
+    def begin_frog_signature(self, duration):
+        self.frog_signature_active = True
+        self.signature_attack_bonus = max(1, int(self.stats['attack'] * 0.1))
+        self.defense_multiplier = 2
+
+    def end_frog_signature(self):
+        self.frog_signature_active = False
+        self.signature_attack_bonus = 0
+        self.defense_multiplier = 1
 
     def input(self):
         if not self.attack_cooldown.active:
@@ -70,6 +109,12 @@ class   Player(Entity):
                 strength = magic_data[self.magic]['strength'] + self.stats['magic']
                 cost = magic_data[self.magic]['cost']
                 self.create_magic(style, strength, cost)
+
+            if recent_keys[pygame.K_c]:
+                self.switch_character()
+
+            if recent_keys[pygame.K_v] and self.signature_ability:
+                self.signature_ability.activate()
 
             if recent_keys[pygame.K_TAB] and not self.weapon_switch_timer:
                 self.weapon_switch_timer.activate()
@@ -104,7 +149,10 @@ class   Player(Entity):
 
         self.frame_index += self.animation_speed * dt
         self.frame_index *= 0 if not self.direction.x and not self.direction.y else 1
-        self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]# Update current image
+        self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])].copy()
+        if self.frog_signature_active:
+            size = (int(self.image.get_width() * 1.5), int(self.image.get_height() * 1.5))
+            self.image = pygame.transform.scale(self.image, size)
         self.rect = self.image.get_frect(center = self.hitbox.center)
 
         if self.vulnerability_timer:
@@ -116,7 +164,7 @@ class   Player(Entity):
     def get_full_weapon_damage(self):
         base_damage = self.stats['attack']
         weapon_damage = weapons_data[self.weapon]['damage']
-        return base_damage + weapon_damage
+        return base_damage + weapon_damage + self.signature_attack_bonus
     
     def get_full_magic_damage(self):
         base_damage = self.stats['magic']
@@ -139,6 +187,8 @@ class   Player(Entity):
         self.attack_cooldown.update()
         self.weapon_switch_timer.update()
         self.magic_switch.update()
+        self.character_switch_timer.update()
+        self.signature_ability.update()
         self.input() 
         self.move(self.stats['speed'], dt)
         self.animate(dt)

@@ -28,6 +28,10 @@ class Enemy(Entity):
         self.attack_type = monster_info['attack_type']
 
         self.attack_timer = Timer(500)
+        self.slow_timer = Timer(0)
+        self.pushback_timer = Timer(0)
+        self.pushback_speed = 0
+        self.speed_multiplier = 1
         self.damage_player = damage_player
         self.trigger_death_particles = trigger_death_particles
         self.add_exp = add_exp
@@ -79,9 +83,11 @@ class Enemy(Entity):
             self.damage_player(self.attack_damage, self.attack_type)
             self.attack_sound.play()
         elif self.status == 'move':
-            self.direction = self.get_player_distance_direction(player)[1]
+            if not self.pushback_timer:
+                self.direction = self.get_player_distance_direction(player)[1]
         else:
-            self.direction = pygame.Vector2()
+            if not self.pushback_timer:
+                self.direction = pygame.Vector2()
 
     def animate(self,dt):
         animation = self.frames[self.status]
@@ -114,6 +120,24 @@ class Enemy(Entity):
                 self.health -= player.get_full_magic_damage()
             self.vulnerability_timer.activate()
 
+    def apply_signature_damage(self, amount):
+        if not self.vulnerability_timer:
+            self.health -= amount
+            self.vulnerability_timer.activate()
+            self.hit_sound.play()
+
+    def apply_pushback(self, direction, strength):
+        self.direction = pygame.Vector2(direction)
+        self.pushback_timer = Timer(250, autostart=True)
+        self.pushback_speed = strength
+
+    def apply_slow(self, duration, multiplier):
+        self.speed_multiplier = multiplier
+        self.slow_timer = Timer(duration, func=self.clear_slow, autostart=True)
+
+    def clear_slow(self):
+        self.speed_multiplier = 1
+
     def check_death(self):
         if self.health <= 0:
             self.kill()
@@ -128,8 +152,13 @@ class Enemy(Entity):
     def update(self,dt):
         self.attack_timer.update()
         self.vulnerability_timer.update()
+        self.slow_timer.update()
+        self.pushback_timer.update()
+        if not self.pushback_timer:
+            self.pushback_speed = 0
         self.knockback()
-        self.move(self.speed,dt)
+        movement_speed = self.pushback_speed or (self.speed * self.speed_multiplier)
+        self.move(movement_speed,dt)
         self.animate(dt)
         self.check_death()
 

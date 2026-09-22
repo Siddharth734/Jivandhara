@@ -11,6 +11,7 @@ from particles import AnimationPlayer
 from magic import MagicPlayer
 from upgrade import Upgrade
 from gameover import GAMEOVER
+from signature_abilities import create_signature_ability
 
 class Level:
     def __init__(self):
@@ -82,7 +83,9 @@ class Level:
                                     self.visible_sprites, 
                                     self.obstacle_sprites,
                                     self.create_attack,
-                                    self.create_magic)
+                                    self.create_magic,
+                                    self.create_signature,
+                                    self.get_enemies)
                             else:
                                 if col == '390': monster_name = 'bamboo'
                                 elif col == '391': monster_name = 'spirit'
@@ -96,6 +99,17 @@ class Level:
                                     self.damage_player,
                                     self.trigger_death_particles,
                                     self.add_exp)
+
+    def get_enemies(self):
+        return [sprite for sprite in self.attackable_sprites
+                if getattr(sprite, 'sprite_type', None) == 'enemy']
+
+    def create_signature(self, character_name, player):
+        return create_signature_ability(
+            character_name,
+            player,
+            self.get_enemies,
+            self.visible_sprites)
 
     def create_attack(self):
         if not hasattr(self, 'weapon') or self.weapon is None or not self.weapon.alive():
@@ -126,7 +140,7 @@ class Level:
 
     def damage_player(self,amount,attack_type):
         if not self.player.vulnerability_timer:
-            self.player.health -= amount
+            self.player.health -= amount / self.player.defense_multiplier
             self.player.vulnerability_timer.activate()
             self.animation_player.create_particles(attack_type, self.player.rect.center, self.visible_sprites)
 
@@ -152,7 +166,6 @@ class Level:
                 self.main_sound.stop()
                 self.main_sound = pygame.mixer.Sound(join('audio', 'rick.wav'))
                 self.main_sound.play()
-            self.gameover.display()
             self.gameover.update(dt)
 
         else:
