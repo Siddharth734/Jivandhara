@@ -28,6 +28,8 @@ class Enemy(Entity):
         self.attack_type = monster_info['attack_type']
 
         self.attack_timer = Timer(500)
+        self.contact_push_timer = Timer(150)
+        self.contact_push_speed = 0
         self.slow_timer = Timer(0)
         self.pushback_timer = Timer(0)
         self.pushback_speed = 0
@@ -80,14 +82,42 @@ class Enemy(Entity):
     #attacks, follows, and stops following according to the radius detection
     def actions(self,player):
         if self.status == 'attack':
-            self.damage_player(self.attack_damage, self.attack_type)
-            self.attack_sound.play()
+            self.attack_player(player)
         elif self.status == 'move':
             if not self.pushback_timer:
                 self.direction = self.get_player_distance_direction(player)[1]
         else:
             if not self.pushback_timer:
                 self.direction = pygame.Vector2()
+
+    def attack_player(self, player):
+        if not self.attack_timer:
+            self.damage_player(self.attack_damage, self.attack_type)
+            self.attack_sound.play()
+            self.attack_timer.activate()
+
+    def separate_from_player(self, player):
+        if not self.rect.colliderect(player.rect):
+            return
+
+        overlap_x = min(self.rect.right, player.rect.right) - max(self.rect.left, player.rect.left)
+        overlap_y = min(self.rect.bottom, player.rect.bottom) - max(self.rect.top, player.rect.top)
+        if overlap_x <= overlap_y:
+            direction = pygame.Vector2(1 if self.rect.centerx >= player.rect.centerx else -1, 0)
+            displacement = (player.rect.right - self.rect.left + 4
+                            if direction.x > 0 else
+                            self.rect.right - player.rect.left + 4)
+        else:
+            direction = pygame.Vector2(0, 1 if self.rect.centery >= player.rect.centery else -1)
+            displacement = (player.rect.bottom - self.rect.top + 4
+                            if direction.y > 0 else
+                            self.rect.bottom - player.rect.top + 4)
+        self.hitbox.center += direction * displacement
+        self.rect.center = self.hitbox.center
+        self.direction = direction
+        self.contact_push_speed = 4
+        self.contact_push_timer.activate()
+        self.attack_player(player)
 
     def animate(self,dt):
         animation = self.frames[self.status]
@@ -154,10 +184,13 @@ class Enemy(Entity):
         self.vulnerability_timer.update()
         self.slow_timer.update()
         self.pushback_timer.update()
+        self.contact_push_timer.update()
         if not self.pushback_timer:
             self.pushback_speed = 0
+        if not self.contact_push_timer:
+            self.contact_push_speed = 0
         self.knockback()
-        movement_speed = self.pushback_speed or (self.speed * self.speed_multiplier)
+        movement_speed = self.pushback_speed or self.contact_push_speed or (self.speed * self.speed_multiplier)
         self.move(movement_speed,dt)
         self.animate(dt)
         self.check_death()
@@ -165,4 +198,5 @@ class Enemy(Entity):
     def enemy_update(self, player):
         self.get_status(player)
         self.actions(player)
+        self.separate_from_player(player)
         player.vulnerability_timer.update()

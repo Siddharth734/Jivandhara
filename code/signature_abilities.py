@@ -28,6 +28,9 @@ class SignatureAbility:
         self.cooldown.update()
         self.active_timer.update()
 
+    def cancel(self):
+        self.active_timer.deactivate()
+
 
 class PlayerSignatureAbility(SignatureAbility):
     cooldown_duration = 30000
@@ -73,7 +76,8 @@ class AnbuClone(Entity):
     def update(self, dt):
         self.lifetime.update()
         self.attack_timer.update()
-        if not self.alive():
+        if not self.alive() or self.player.character_name != 'playerAnbu':
+            self.kill()
             return
 
         target = self.nearest_enemy()
@@ -97,6 +101,16 @@ class AnbuSignatureAbility(SignatureAbility):
     clone_count = 4
     duration = 8000
 
+    def __init__(self, player, get_enemies, visible_sprites):
+        super().__init__(player, get_enemies, visible_sprites)
+        self.clones = []
+
+    def cancel(self):
+        super().cancel()
+        for clone in self.clones:
+            clone.kill()
+        self.clones.clear()
+
     def activate(self):
         if not super().activate():
             return False
@@ -110,12 +124,18 @@ class AnbuSignatureAbility(SignatureAbility):
             clone = AnbuClone(self.player, self.get_enemies, self.visible_sprites, clone_image.copy(), self.duration)
             clone.rect.center = self.player.rect.center + pygame.Vector2(48, 0).rotate(-angle)
             clone.hitbox.center = clone.rect.center
+            self.clones.append(clone)
         return True
 
 
 class FrogSignatureAbility(SignatureAbility):
     cooldown_duration = 30000
     duration = 10000
+
+    def cancel(self):
+        if self.active:
+            self.player.end_frog_signature()
+        super().cancel()
 
     def activate(self):
         if not super().activate():

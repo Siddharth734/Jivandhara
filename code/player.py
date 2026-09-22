@@ -67,9 +67,10 @@ class   Player(Entity):
                 self.frames[state] = self.frames[state.replace('_idle', '')]
 
     def switch_character(self):
-        if self.character_switch_timer or self.signature_ability.active:
+        if self.character_switch_timer:
             return False
 
+        self.signature_ability.cancel()
         self.character_index = (self.character_index + 1) % len(self.character_names)
         self.character_name = self.character_names[self.character_index]
         self.state = self.state.split('_')[0]
