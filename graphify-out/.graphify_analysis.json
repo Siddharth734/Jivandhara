@@ -1,0 +1,350 @@
+{
+  "communities": {
+    "0": [
+      "code_debug",
+      "code_debug_debug",
+      "code_enemy",
+      "code_entity",
+      "code_entity_entity",
+      "code_entity_entity_collision",
+      "code_entity_entity_init",
+      "code_entity_entity_move",
+      "code_entity_entity_wave_value",
+      "code_gameover",
+      "code_level",
+      "code_player",
+      "code_settings",
+      "code_signature_abilities",
+      "code_signature_abilities_create_signature_ability",
+      "code_timee",
+      "code_timee_timer",
+      "code_timee_timer_activate",
+      "code_timee_timer_bool",
+      "code_timee_timer_deactivate",
+      "code_timee_timer_init",
+      "code_timee_timer_update",
+      "code_upgrade",
+      "code_weapon",
+      "math",
+      "os",
+      "os_path",
+      "pygame",
+      "pytmx_util_pygame",
+      "random"
+    ],
+    "1": [
+      "code_signature_abilities_anbuclone",
+      "code_signature_abilities_anbuclone_init",
+      "code_signature_abilities_anbuclone_nearest_enemy",
+      "code_signature_abilities_anbuclone_update",
+      "code_signature_abilities_anbusignatureability",
+      "code_signature_abilities_anbusignatureability_activate",
+      "code_signature_abilities_anbusignatureability_cancel",
+      "code_signature_abilities_anbusignatureability_init",
+      "code_signature_abilities_befriendsignatureability",
+      "code_signature_abilities_befriendsignatureability_activate",
+      "code_signature_abilities_befriendsignatureability_clear_friend",
+      "code_signature_abilities_frogsignatureability",
+      "code_signature_abilities_frogsignatureability_activate",
+      "code_signature_abilities_frogsignatureability_cancel",
+      "code_signature_abilities_frogsignatureability_finish",
+      "code_signature_abilities_playersignatureability",
+      "code_signature_abilities_playersignatureability_activate",
+      "code_signature_abilities_signatureability",
+      "code_signature_abilities_signatureability_activate",
+      "code_signature_abilities_signatureability_active",
+      "code_signature_abilities_signatureability_cancel",
+      "code_signature_abilities_signatureability_init",
+      "code_signature_abilities_signatureability_update"
+    ],
+    "2": [
+      "code_enemy_enemy",
+      "code_enemy_enemy_actions",
+      "code_enemy_enemy_animate",
+      "code_enemy_enemy_apply_pushback",
+      "code_enemy_enemy_apply_signature_damage",
+      "code_enemy_enemy_apply_slow",
+      "code_enemy_enemy_attack_player",
+      "code_enemy_enemy_befriend",
+      "code_enemy_enemy_check_death",
+      "code_enemy_enemy_clear_friend",
+      "code_enemy_enemy_clear_slow",
+      "code_enemy_enemy_enemy_update",
+      "code_enemy_enemy_get_damage",
+      "code_enemy_enemy_get_nearest_enemy",
+      "code_enemy_enemy_get_player_distance_direction",
+      "code_enemy_enemy_get_status",
+      "code_enemy_enemy_import_graphics",
+      "code_enemy_enemy_init",
+      "code_enemy_enemy_knockback",
+      "code_enemy_enemy_separate_from_player",
+      "code_enemy_enemy_update"
+    ],
+    "3": [
+      "code_level_level",
+      "code_level_level_activate_stage_2",
+      "code_level_level_add_exp",
+      "code_level_level_create_attack",
+      "code_level_level_create_magic",
+      "code_level_level_create_signature",
+      "code_level_level_damage_player",
+      "code_level_level_get_enemies",
+      "code_level_level_killit",
+      "code_level_level_player_attack_logic",
+      "code_level_level_run",
+      "code_level_level_toggle_menu",
+      "code_level_level_trigger_death_particles",
+      "code_main",
+      "code_main_game",
+      "code_main_game_init",
+      "code_main_game_run",
+      "code_weapon_weapon",
+      "code_weapon_weapon_init",
+      "sys"
+    ],
+    "4": [
+      "code_level_level_create_map",
+      "code_level_level_init",
+      "code_level_ysortcameragroup",
+      "code_level_ysortcameragroup_draw",
+      "code_level_ysortcameragroup_enemy_update",
+      "code_level_ysortcameragroup_init",
+      "code_particles",
+      "code_particles_animationplayer",
+      "code_particles_animationplayer_create_grass_particles",
+      "code_particles_animationplayer_create_particles",
+      "code_particles_animationplayer_init",
+      "code_particles_animationplayer_reflect_images",
+      "code_particles_particleeffect",
+      "code_particles_particleeffect_animate",
+      "code_particles_particleeffect_init",
+      "code_particles_particleeffect_update",
+      "code_support",
+      "code_support_import_csv_layout",
+      "code_support_import_folder",
+      "csv"
+    ],
+    "5": [
+      "code_player_player",
+      "code_player_player_animate",
+      "code_player_player_begin_frog_signature",
+      "code_player_player_end_frog_signature",
+      "code_player_player_energy_recovery",
+      "code_player_player_get_cost_by_index",
+      "code_player_player_get_full_magic_damage",
+      "code_player_player_get_full_weapon_damage",
+      "code_player_player_get_value_by_index",
+      "code_player_player_import_player_assets",
+      "code_player_player_init",
+      "code_player_player_input",
+      "code_player_player_switch_character",
+      "code_player_player_update"
+    ],
+    "6": [
+      "code_upgrade_item",
+      "code_upgrade_item_display",
+      "code_upgrade_item_display_bar",
+      "code_upgrade_item_display_names",
+      "code_upgrade_item_init",
+      "code_upgrade_item_trigger",
+      "code_upgrade_upgrade",
+      "code_upgrade_upgrade_create_items",
+      "code_upgrade_upgrade_display",
+      "code_upgrade_upgrade_init",
+      "code_upgrade_upgrade_input"
+    ],
+    "7": [
+      "code_ui",
+      "code_ui_ui",
+      "code_ui_ui_display",
+      "code_ui_ui_init",
+      "code_ui_ui_magic_overlay",
+      "code_ui_ui_selection_box",
+      "code_ui_ui_show_bar",
+      "code_ui_ui_show_exp",
+      "code_ui_ui_weapon_overlay"
+    ],
+    "8": [
+      "code_gameover_gameover",
+      "code_gameover_gameover_display",
+      "code_gameover_gameover_init",
+      "code_gameover_gameover_make",
+      "code_gameover_gameover_update"
+    ],
+    "9": [
+      "code_magic",
+      "code_magic_magicplayer",
+      "code_magic_magicplayer_flame",
+      "code_magic_magicplayer_heal",
+      "code_magic_magicplayer_init"
+    ],
+    "10": [
+      "code_tile",
+      "code_tile_tile",
+      "code_tile_tile_init"
+    ],
+    "11": [
+      "code_test"
+    ]
+  },
+  "cohesion": {
+    "0": 0.15862068965517243,
+    "1": 0.11462450592885376,
+    "2": 0.15714285714285714,
+    "3": 0.12105263157894737,
+    "4": 0.14210526315789473,
+    "5": 0.2087912087912088,
+    "6": 0.2545454545454545,
+    "7": 0.3888888888888889,
+    "8": 0.6,
+    "9": 0.4,
+    "10": 0.6666666666666666,
+    "11": 1.0
+  },
+  "gods": [
+    {
+      "id": "code_timee_timer",
+      "label": "Timer",
+      "degree": 39
+    },
+    {
+      "id": "code_level_level",
+      "label": "Level",
+      "degree": 28
+    },
+    {
+      "id": "code_enemy_enemy",
+      "label": "Enemy",
+      "degree": 26
+    },
+    {
+      "id": "code_player_player",
+      "label": "Player",
+      "degree": 19
+    },
+    {
+      "id": "code_entity_entity",
+      "label": "Entity",
+      "degree": 12
+    },
+    {
+      "id": "code_signature_abilities_signatureability",
+      "label": "SignatureAbility",
+      "degree": 11
+    },
+    {
+      "id": "code_ui_ui",
+      "label": "UI",
+      "degree": 11
+    },
+    {
+      "id": "code_upgrade_upgrade",
+      "label": "Upgrade",
+      "degree": 9
+    },
+    {
+      "id": "code_particles_animationplayer",
+      "label": "AnimationPlayer",
+      "degree": 8
+    },
+    {
+      "id": "code_gameover_gameover",
+      "label": "GAMEOVER",
+      "degree": 8
+    }
+  ],
+  "surprises": [
+    {
+      "source": "Enemy",
+      "target": "Timer",
+      "source_files": [
+        "code/enemy.py",
+        "code/timee.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "uses",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "Level",
+      "target": "Timer",
+      "source_files": [
+        "code/level.py",
+        "code/timee.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "uses",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "Player",
+      "target": "Timer",
+      "source_files": [
+        "code/player.py",
+        "code/timee.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "uses",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "AnbuClone",
+      "target": "Timer",
+      "source_files": [
+        "code/signature_abilities.py",
+        "code/timee.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "uses",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "AnbuSignatureAbility",
+      "target": "Timer",
+      "source_files": [
+        "code/signature_abilities.py",
+        "code/timee.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "uses",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `Timer` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 5`, `Community 6`?",
+      "why": "High betweenness centrality (0.350) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `Level` connect `Community 3` to `Community 0`, `Community 2`, `Community 4`, `Community 5`, `Community 6`, `Community 7`, `Community 8`, `Community 9`, `Community 10`?",
+      "why": "High betweenness centrality (0.251) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `Enemy` connect `Community 2` to `Community 0`, `Community 3`, `Community 4`?",
+      "why": "High betweenness centrality (0.184) - this node is a cross-community bridge."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 10 inferred relationships involving `Timer` (e.g. with `Enemy` and `Entity`) actually correct?",
+      "why": "`Timer` has 10 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 11 inferred relationships involving `Level` (e.g. with `Enemy` and `GAMEOVER`) actually correct?",
+      "why": "`Level` has 11 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 2 inferred relationships involving `Enemy` (e.g. with `Timer` and `Level`) actually correct?",
+      "why": "`Enemy` has 2 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 2 inferred relationships involving `Player` (e.g. with `Level` and `Timer`) actually correct?",
+      "why": "`Player` has 2 INFERRED edges - model-reasoned connections that need verification."
+    }
+  ]
+}
